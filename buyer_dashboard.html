@@ -1,0 +1,161 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="d-flex align-items-center justify-content-between mb-5 flex-wrap gap-2">
+        <div>
+            <h3 class="fw-bold mb-1">Buyer Operations Dashboard</h3>
+            <p class="text-muted small mb-0">Track shipments, browse regional harvests, and manage payments.</p>
+        </div>
+        <a href="{{ url_for('marketplace') }}" class="btn btn-agri text-white">
+            <i class="fa-solid fa-basket-shopping me-2"></i>Browse New Crops
+        </a>
+    </div>
+
+    <!-- Metrics row -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card sales">
+                <div>
+                    <small class="text-muted d-block font-semibold">Total Purchases</small>
+                    <h3 class="fw-bold text-success mb-0 mt-1">₹ {{ total_spent }}</h3>
+                </div>
+                <i class="fa-solid fa-indian-rupee-sign stat-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card orders">
+                <div>
+                    <small class="text-muted d-block font-semibold">Active Orders</small>
+                    <h3 class="fw-bold text-warning mb-0 mt-1">{{ active_orders }}</h3>
+                </div>
+                <i class="fa-solid fa-clock stat-icon text-warning"></i>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <small class="text-muted d-block font-semibold">Shopping Cart</small>
+                    <h3 class="fw-bold text-success mb-0 mt-1">{{ session.get('cart')|length }} Items</h3>
+                </div>
+                <i class="fa-solid fa-cart-shopping stat-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card earnings">
+                <div>
+                    <small class="text-muted d-block font-semibold">AI Diagnoses</small>
+                    <h3 class="fw-bold text-success mb-0 mt-1">94.8%</h3>
+                </div>
+                <i class="fa-solid fa-brain stat-icon text-success"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-5">
+        <!-- Recommended Regional Crops -->
+        <div class="col-lg-4">
+            <div class="card-agri p-4 h-100 bg-white shadow-sm border-0">
+                <h5 class="fw-bold mb-3 text-success"><i class="fa-solid fa-map-location-dot me-2"></i>Regional Crop Matches</h5>
+                <p class="text-muted small mb-4">Harvests listed closest to your verified shipping location:</p>
+                
+                <div class="d-flex flex-column gap-3">
+                    {% if local_crops %}
+                        {% for crop in local_crops %}
+                        <div class="d-flex align-items-center gap-3 p-2 bg-light rounded-3">
+                            {% if crop.image_url.startswith('http://') or crop.image_url.startswith('https://') %}
+                            <img src="{{ crop.image_url }}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-2" alt="">
+                            {% elif crop.image_url.startswith('uploads/') %}
+                            <img src="{{ url_for('static', filename=crop.image_url) }}" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-2" alt="">
+                            {% else %}
+                                {% if crop.category == 'Grains' %}
+                                <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?q=80&w=600" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-2" alt="">
+                                {% elif crop.category == 'Vegetables' %}
+                                <img src="https://images.unsplash.com/photo-1597362925123-77861d3fbac7?q=80&w=600" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-2" alt="">
+                                {% elif crop.category == 'Fruits' %}
+                                <img src="https://images.unsplash.com/photo-1619546813926-a78fa6372cd2?q=80&w=600" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-2" alt="">
+                                {% elif crop.category == 'Pulses' %}
+                                <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-2" alt="">
+                                {% else %}
+                                <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=600" style="width: 60px; height: 60px; object-fit: cover;" class="rounded-2" alt="">
+                                {% endif %}
+                            {% endif %}
+                            <div class="flex-grow-1 min-w-0">
+                                <h6 class="mb-0 fw-bold text-truncate text-dark small" style="font-size: 0.85rem;">{{ crop.name }}</h6>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;"><i class="fa-solid fa-location-dot me-1"></i>{{ crop.location }}</small>
+                                <span class="fw-bold text-success small" style="font-size: 0.8rem;">₹ {{ crop.price }}/kg</span>
+                            </div>
+                            <a href="{{ url_for('marketplace') }}" class="btn btn-sm btn-agri text-white p-2 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                <i class="fa-solid fa-angle-right" style="font-size: 0.8rem;"></i>
+                            </a>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p class="text-muted small">No local crops registered in your area yet. Click browse crops to see other listings!</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Shipment Tracker/Order History Summary -->
+        <div class="col-lg-8">
+            <div class="card-agri p-4 h-100 bg-white shadow-sm border-0">
+                <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-2">
+                    <h5 class="fw-bold mb-0"><i class="fa-solid fa-receipt text-success me-2"></i>My Purchases & Tracking</h5>
+                    <a href="{{ url_for('cart_view') }}" class="btn btn-sm btn-outline-agri">View Detailed Orders</a>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle small mb-0">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Crop Details</th>
+                                <th>Seller Farmer</th>
+                                <th>Purchase Qty</th>
+                                <th>Total Paid</th>
+                                <th>Shipment Status</th>
+                                <th>Ordered Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if orders %}
+                                {% for order in orders[:5] %}
+                                <tr>
+                                    <td class="fw-bold">#{{ order.id }}</td>
+                                    <td>
+                                        <span class="fw-semibold">{{ order.crop.name if order.crop else 'Deleted Crop' }}</span>
+                                    </td>
+                                    <td>{{ order.farmer.username }}</td>
+                                    <td>{{ order.quantity }} kg</td>
+                                    <td class="fw-bold text-success">₹ {{ order.total_price }}</td>
+                                    <td>
+                                        {% if order.status == 'Pending' %}
+                                            <span class="badge bg-warning-subtle text-warning">Pending Shipment</span>
+                                        {% elif order.status == 'Shipped' %}
+                                            <span class="badge bg-primary-subtle text-primary">In Transit</span>
+                                        {% elif order.status == 'Delivered' %}
+                                            <span class="badge bg-success-subtle text-success">Delivered</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-subtle text-danger">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted">{{ order.created_at.strftime('%d %b %Y') }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-cart-shopping fs-3 mb-2 d-block text-muted"></i>
+                                        You haven't ordered any crops yet. Check out the <a href="{{ url_for('marketplace') }}" class="fw-bold text-success">Crop Marketplace</a>!
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

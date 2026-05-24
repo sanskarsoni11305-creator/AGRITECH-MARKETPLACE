@@ -1,0 +1,488 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="mb-5 text-center">
+        <h2 class="fw-bold"><i class="fa-solid fa-brain text-success me-2 animate-pulse"></i>AgriConnect AI Digital Agriculture Hub</h2>
+        <p class="text-muted col-md-7 mx-auto">Access crop recommendations, seasonal wholesale price forecasts, digital leaf pathology analyzers, and weather safety guidelines.</p>
+    </div>
+
+    <!-- AI Hub Tabs Container -->
+    <div class="card-agri p-4 bg-white border-0 shadow-sm mb-5">
+        <!-- Tab Navigation Buttons -->
+        <ul class="nav nav-pills ai-nav-pills mb-4 justify-content-center" id="aiTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="recommendation-tab" data-bs-toggle="pill" data-bs-target="#recommendation-panel" type="button" role="tab" aria-controls="recommendation-panel" aria-selected="true">
+                    <i class="fa-solid fa-seedling me-2"></i>Soil Crop Recommendation
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="prediction-tab" data-bs-toggle="pill" data-bs-target="#prediction-panel" type="button" role="tab" aria-controls="prediction-panel" aria-selected="false">
+                    <i class="fa-solid fa-chart-line me-2"></i>Market Price Prediction
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="disease-tab" data-bs-toggle="pill" data-bs-target="#disease-panel" type="button" role="tab" aria-controls="disease-panel" aria-selected="false">
+                    <i class="fa-solid fa-microscope me-2"></i>AI Leaf Diagnostics
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="weather-tab" data-bs-toggle="pill" data-bs-target="#weather-panel" type="button" role="tab" aria-controls="weather-panel" aria-selected="false">
+                    <i class="fa-solid fa-cloud-sun-rain me-2"></i>Weather Forecast Advisor
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="aiTabsContent">
+            <!-- 1. SOIL CROP RECOMMENDATION PANEL -->
+            <div class="tab-pane fade show active" id="recommendation-panel" role="tabpanel" aria-labelledby="recommendation-tab">
+                <div class="row g-4">
+                    <div class="col-lg-5">
+                        <div class="p-4 bg-light rounded-4 h-100">
+                            <h5 class="fw-bold mb-3 text-success"><i class="fa-solid fa-vial me-2"></i>Enter Soil Nutrients</h5>
+                            <p class="text-muted small mb-4">Input Nitrogen, Phosphorus, Potassium, soil pH, and local climatic attributes to calculate the crop matching ratios.</p>
+                            
+                            <form id="recommend-form">
+                                <div class="row g-3">
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-muted">Nitrogen (N)</label>
+                                        <input type="number" class="form-control bg-white" id="soil-n" value="80" min="0" max="150" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-muted">Phosphorus (P)</label>
+                                        <input type="number" class="form-control bg-white" id="soil-p" value="45" min="0" max="100" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-muted">Potassium (K)</label>
+                                        <input type="number" class="form-control bg-white" id="soil-k" value="40" min="0" max="120" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-muted">Soil pH Value</label>
+                                        <input type="number" step="0.1" class="form-control bg-white" id="soil-ph" value="6.5" min="3.5" max="9.0" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-muted">Avg Temp (°C)</label>
+                                        <input type="number" step="0.1" class="form-control bg-white" id="soil-temp" value="26.0" min="0" max="50" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <label class="form-label small fw-semibold text-muted">Rainfall (mm)</label>
+                                        <input type="number" step="1" class="form-control bg-white" id="soil-rain" value="1000" min="50" max="3000" required>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-agri w-100 py-2 mt-4 text-white">
+                                    <i class="fa-solid fa-wand-magic-sparkles me-2"></i>Compute Recommended Crops
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="p-4 border rounded-4 h-100 bg-white">
+                            <h5 class="fw-bold mb-4 text-success"><i class="fa-solid fa-rectangle-list me-2"></i>AI Soil Match Recommendations</h5>
+                            
+                            <div id="recommend-results" class="d-flex flex-column gap-3">
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-seedling fs-1 mb-2 opacity-50"></i>
+                                    <p class="small mb-0">Fill out and submit the parameters form on the left to activate the AI matching engine.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. MARKET PRICE PREDICTION PANEL -->
+            <div class="tab-pane fade" id="prediction-panel" role="tabpanel" aria-labelledby="prediction-tab">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="p-4 bg-light rounded-4 h-100 d-flex flex-column justify-content-between">
+                            <div>
+                                <h5 class="fw-bold mb-3 text-success"><i class="fa-solid fa-magnifying-glass-chart me-2"></i>Select Farm Harvest</h5>
+                                <p class="text-muted small mb-4">View 6-month seasonal forecasts based on regional wholesale logs to optimize crop pricing policies.</p>
+                                
+                                <div class="mb-4">
+                                    <label class="form-label small fw-semibold text-muted">Select Crop</label>
+                                    <select class="form-select bg-white" id="predict-crop-select">
+                                        <option value="Premium Basmati Rice">Premium Basmati Rice</option>
+                                        <option value="Sharbati Organic Wheat">Sharbati Organic Wheat</option>
+                                        <option value="Nashik Red Onions">Nashik Red Onions</option>
+                                        <option value="Alphonso Mangoes">Alphonso Mangoes</option>
+                                        <option value="Yellow Split Pigeon Peas (Toor Dal)">Yellow Split Pigeon Peas (Toor Dal)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="bg-white p-3 rounded-3 shadow-sm border border-success-subtle mb-3">
+                                <h6 class="fw-bold small mb-2 text-success"><i class="fa-solid fa-circle-info me-1"></i>Seasonal Trade Guide</h6>
+                                <p class="text-muted small mb-0" style="font-size: 0.75rem; line-height: 1.4;">Escrow logistics logs indicate bulk buying volumes spike around late Rabi and early Kharif months. Crop rates typically climb off-season.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="p-4 border rounded-4 bg-white h-100">
+                            <h5 class="fw-bold mb-4 text-success"><i class="fa-solid fa-chart-line me-2"></i>6-Month Future Price Projection</h5>
+                            
+                            <div style="height: 300px;" class="mb-4 position-relative">
+                                <canvas id="aiPredictionChart"></canvas>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="table table-sm align-middle small text-center mb-0" id="predict-table">
+                                    <thead class="table-light">
+                                        <tr id="predict-months-row"></tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr id="predict-prices-row" class="fw-bold text-success"></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. AI LEAF DISEASE PANEL -->
+            <div class="tab-pane fade" id="disease-panel" role="tabpanel" aria-labelledby="disease-tab">
+                <div class="row g-4">
+                    <div class="col-lg-5">
+                        <div class="p-4 bg-light rounded-4 h-100">
+                            <h5 class="fw-bold mb-3 text-success"><i class="fa-solid fa-leaf-disease me-2"></i>Crop Diagnostics</h5>
+                            <p class="text-muted small mb-4">Choose crop/plant type and upload leaf photography to detect potential blights or molds instantly.</p>
+                            
+                            <form id="disease-form" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold text-muted">Select Plant Type</label>
+                                    <select class="form-select bg-white" id="disease-plant-type" name="plant_type">
+                                        <option value="Tomato">Tomato</option>
+                                        <option value="Potato">Potato</option>
+                                        <option value="Rice">Rice</option>
+                                        <option value="Apple">Apple</option>
+                                    </select>
+                                </div>
+                                <div class="mb-4">
+                                    <label class="form-label small fw-semibold text-muted">Upload Photo</label>
+                                    <input class="form-control" type="file" id="disease-image" name="image" accept="image/*" required>
+                                </div>
+                                <button type="submit" class="btn btn-agri w-100 py-2 text-white" id="btn-disease-submit">
+                                    <i class="fa-solid fa-stethoscope me-2"></i>Diagnose Plant Leaf
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-7">
+                        <div class="p-4 border rounded-4 bg-white h-100" id="disease-results-card">
+                            <h5 class="fw-bold mb-4 text-success"><i class="fa-solid fa-file-medical me-2"></i>Leaf Pathology Diagnostics Report</h5>
+                            
+                            <div id="disease-results-body" class="d-flex flex-column gap-3">
+                                <div class="text-center py-5 text-muted">
+                                    <i class="fa-solid fa-microscope fs-1 mb-2 opacity-50"></i>
+                                    <p class="small mb-0">Select plant type and upload crop photo on the left to start image diagnostic analysis.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. WEATHER FORECAST ADVISOR PANEL -->
+            <div class="tab-pane fade" id="weather-panel" role="tabpanel" aria-labelledby="weather-tab">
+                <div class="row g-4">
+                    <div class="col-lg-4">
+                        <div class="p-4 bg-light rounded-4 h-100 text-center d-flex flex-column justify-content-between">
+                            <div>
+                                <h5 class="fw-bold mb-4 text-success"><i class="fa-solid fa-cloud-sun me-2"></i>Local Conditions</h5>
+                                <div class="my-4">
+                                    <i class="fa-solid fa-cloud-showers-heavy text-primary mb-2" style="font-size: 5rem; animation: pulse-soft 2s infinite;"></i>
+                                    <h3 class="fw-bold mt-2 mb-0">24.5 °C</h3>
+                                    <span class="text-muted small">Moderate Rain, Humid Atmosphere</span>
+                                </div>
+                                <hr class="text-muted">
+                                <div class="row g-3 text-start small mb-3">
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Humidity</small>
+                                        <span class="fw-bold text-dark">85%</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Wind Speed</small>
+                                        <span class="fw-bold text-dark">18 km/h</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">Soil Moisture</small>
+                                        <span class="fw-bold text-dark">Optimal (High)</span>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-muted d-block">UV Index</small>
+                                        <span class="fw-bold text-dark">3 (Low)</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-start">
+                                <span class="badge bg-warning-subtle text-warning"><i class="fa-solid fa-triangle-exclamation me-1"></i>Weather Alert</span>
+                                <small class="text-muted d-block mt-1" style="font-size: 0.7rem;">Heavy rainfall forecasted in Amritsar and Nashik regions for next 48 hours.</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-8">
+                        <div class="p-4 border rounded-4 bg-white h-100">
+                            <h5 class="fw-bold mb-4 text-success"><i class="fa-solid fa-tractor me-2"></i>AI Agricultural Weather Advisories</h5>
+                            
+                            <div class="d-flex flex-column gap-3">
+                                <div class="p-3 bg-danger-subtle rounded-3 border-start border-danger border-4 d-flex gap-3">
+                                    <i class="fa-solid fa-ban text-danger fs-3 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-bold text-danger mb-1">Avoid Chemical Sprays</h6>
+                                        <small class="text-muted d-block" style="font-size: 0.8rem;">Chemical pesticide and fertilizer sprays should be suspended. Immediate rains will wash away components into groundwater pools, creating losses.</small>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-3 bg-warning-subtle rounded-3 border-start border-warning border-4 d-flex gap-3">
+                                    <i class="fa-solid fa-droplet text-warning fs-3 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-bold text-warning mb-1">Activate Drainage Channels</h6>
+                                        <small class="text-muted d-block" style="font-size: 0.8rem;">Ensure that all crop fields (particularly potato tubers and pulses) have clear, unclogged drainage trenches to prevent crop waterlogging and root rot diseases.</small>
+                                    </div>
+                                </div>
+
+                                <div class="p-3 bg-success-subtle rounded-3 border-start border-success border-4 d-flex gap-3">
+                                    <i class="fa-solid fa-wheat-awn text-success fs-3 mt-1"></i>
+                                    <div>
+                                        <h6 class="fw-bold text-success mb-1">Delay Ripened Harvests</h6>
+                                        <small class="text-muted d-block" style="font-size: 0.8rem;">If grain crops (wheat/rice) are ripe, postpone manual mowing till dry atmospheric conditions. Freshly cut grain will quickly mold if damp.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // ==========================================
+        // 1. SOIL RECOMMENDATION ENGINE DYNAMICS
+        // ==========================================
+        const recommendForm = document.getElementById('recommend-form');
+        const recommendResults = document.getElementById('recommend-results');
+
+        recommendForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            recommendResults.innerHTML = '<div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-2 text-success mb-2"></i><br><span class="text-muted small">Soil Matching Algorithm Running...</span></div>';
+            
+            const reqBody = {
+                n: document.getElementById('soil-n').value,
+                p: document.getElementById('soil-p').value,
+                k: document.getElementById('soil-k').value,
+                ph: document.getElementById('soil-ph').value,
+                temp: document.getElementById('soil-temp').value,
+                rainfall: document.getElementById('soil-rain').value
+            };
+
+            fetch('/api/ai/recommend', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(reqBody)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.length === 0) {
+                    recommendResults.innerHTML = '<div class="text-center py-4 text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>No optimal crop matches calculated. Try different parameters.</div>';
+                    return;
+                }
+                
+                let html = '';
+                data.forEach((item, index) => {
+                    let medal = 'fa-award text-success';
+                    if (index === 0) medal = 'fa-trophy text-warning fs-4';
+                    else if (index === 1) medal = 'fa-medal text-secondary fs-5';
+                    
+                    html += `
+                        <div class="p-3 border rounded-3 bg-light shadow-sm">
+                            <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <i class="fa-solid ${medal}"></i>
+                                    <h6 class="mb-0 fw-bold text-dark">${item.crop_name}</h6>
+                                </div>
+                                <span class="badge bg-success py-2 px-3 fw-bold rounded-pill">${item.confidence}% Match Rating</span>
+                            </div>
+                            <ul class="list-unstyled mb-0 small text-muted d-flex flex-column gap-1 pt-1 border-top mt-2">
+                                <li><i class="fa-solid fa-calendar text-success me-2"></i><strong>Sowing Period:</strong> ${item.sowing_time}</li>
+                                <li><i class="fa-solid fa-seedling text-success me-2"></i><strong>Yield Estimate:</strong> ${item.expected_yield}</li>
+                                <li><i class="fa-solid fa-circle-check text-success me-2"></i><strong>Guideline:</strong> ${item.advice}</li>
+                            </ul>
+                        </div>
+                    `;
+                });
+                
+                recommendResults.innerHTML = `<div class="d-flex flex-column gap-3">${html}</div>`;
+            })
+            .catch(err => {
+                recommendResults.innerHTML = '<div class="text-center py-4 text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>Server processing error. Check parameters.</div>';
+            });
+        });
+
+        // ==========================================
+        // 2. SEASONAL PRICE FORECAST CHART ENGINE
+        // ==========================================
+        const cropSelect = document.getElementById('predict-crop-select');
+        const monthsRow = document.getElementById('predict-months-row');
+        const pricesRow = document.getElementById('predict-prices-row');
+        let forecastChart = null;
+
+        function runPriceForecast(crop) {
+            fetch(`/api/ai/price-prediction?crop=${encodeURIComponent(crop)}`)
+                .then(res => res.json())
+                .then(data => {
+                    // Update table headers
+                    let headHtml = '<th class="bg-light text-muted small">Month</th>';
+                    data.months.forEach(m => {
+                        headHtml += `<th class="small fw-semibold text-muted">${m}</th>`;
+                    });
+                    monthsRow.innerHTML = headHtml;
+
+                    // Update table prices
+                    let priceHtml = '<td class="fw-bold bg-light small text-muted">Price / kg</td>';
+                    data.prices.forEach(p => {
+                        priceHtml += `<td class="fw-bold text-success small">₹ ${p}</td>`;
+                    });
+                    pricesRow.innerHTML = priceHtml;
+
+                    // Draw / Update Chart.js Line Chart
+                    const chartCtx = document.getElementById('aiPredictionChart').getContext('2d');
+                    
+                    if (forecastChart) {
+                        forecastChart.destroy();
+                    }
+
+                    const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
+                    gradient.addColorStop(0, 'rgba(46, 125, 50, 0.4)');
+                    gradient.addColorStop(1, 'rgba(46, 125, 50, 0.0)');
+
+                    forecastChart = new Chart(chartCtx, {
+                        type: 'line',
+                        data: {
+                            labels: data.months,
+                            datasets: [{
+                                label: 'Predicted Wholesale Value (₹/kg)',
+                                data: data.prices,
+                                borderColor: '#2e7d32',
+                                borderWidth: 3,
+                                backgroundColor: gradient,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#1b5e20',
+                                pointBorderColor: '#fff',
+                                pointHoverRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: { display: false }
+                            },
+                            scales: {
+                                y: {
+                                    grid: { color: 'rgba(0, 0, 0, 0.05)' },
+                                    ticks: { color: '#8d9a8d' }
+                                },
+                                x: {
+                                    grid: { display: false },
+                                    ticks: { color: '#8d9a8d' }
+                                }
+                            }
+                        }
+                    });
+                });
+        }
+
+        cropSelect.addEventListener('change', function() {
+            runPriceForecast(this.value);
+        });
+
+        // Trigger first chart render on tab show
+        const predictionTab = document.getElementById('prediction-tab');
+        predictionTab.addEventListener('shown.bs.tab', function () {
+            runPriceForecast(cropSelect.value);
+        });
+
+        // ==========================================
+        // 3. LEAF DIAGNOSTIC FILE UPLOADER
+        // ==========================================
+        const diseaseForm = document.getElementById('disease-form');
+        const diseaseBody = document.getElementById('disease-results-body');
+        const submitBtn = document.getElementById('btn-disease-submit');
+
+        diseaseForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Analyzing Visual Pathology...';
+            diseaseBody.innerHTML = '<div class="text-center py-5"><i class="fa-solid fa-spinner fa-spin fs-2 text-success mb-2"></i><br><span class="text-muted small">Diagnostic leaf color matching active...</span></div>';
+            
+            const formData = new FormData(diseaseForm);
+            
+            fetch('/api/ai/disease-detect', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.json())
+            .then(diag => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-stethoscope me-2"></i>Diagnose Plant Leaf';
+                
+                diseaseBody.innerHTML = `
+                    <div class="d-flex flex-column gap-3 text-start pt-1">
+                        <div class="p-3 border rounded-3 bg-light shadow-sm">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2 border-bottom pb-2">
+                                <h6 class="fw-bold mb-0 text-danger text-capitalize"><i class="fa-solid fa-triangle-exclamation me-1"></i>Diagnosis: ${diag.disease}</h6>
+                                <span class="badge bg-danger py-2 px-3 fw-bold rounded-pill">${diag.confidence} Confidence</span>
+                            </div>
+                            <div class="row g-3">
+                                <div class="col-md-4 text-center">
+                                    <small class="text-muted d-block font-semibold mb-2">Processed Leaf Photo</small>
+                                    <img src="${diag.uploaded_image === 'mock_disease.png' ? 'https://images.unsplash.com/photo-1592417817098-8f3d6eb19675?q=80&w=300' : '/static/' + diag.uploaded_image}" class="img-fluid rounded-3 border" style="max-height: 120px; object-fit: cover;">
+                                </div>
+                                <div class="col-md-8">
+                                    <p class="text-muted small mb-0 mt-1"><strong>Description:</strong> ${diag.description}</p>
+                                    <p class="text-muted small mb-0 mt-2"><strong>Visual Symptoms:</strong> ${diag.symptoms}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="p-3 border-start border-success border-4 bg-success-subtle rounded-3 h-100">
+                                    <h6 class="fw-bold text-success small mb-2"><i class="fa-solid fa-leaf me-1"></i>Organic / Bio Treatments</h6>
+                                    <p class="text-muted mb-0" style="font-size:0.75rem; line-height: 1.4;">${diag.treatment_organic}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="p-3 border-start border-primary border-4 bg-primary-subtle rounded-3 h-100">
+                                    <h6 class="fw-bold text-primary small mb-2"><i class="fa-solid fa-flask-vial me-1"></i>Chemical Guidelines</h6>
+                                    <p class="text-muted mb-0" style="font-size:0.75rem; line-height: 1.4;">${diag.treatment_chemical}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            })
+            .catch(err => {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fa-solid fa-stethoscope me-2"></i>Diagnose Plant Leaf';
+                diseaseBody.innerHTML = '<div class="text-center py-4 text-danger small"><i class="fa-solid fa-circle-exclamation me-1"></i>Processing failed. Check uploader file format.</div>';
+            });
+        });
+    });
+</script>
+{% endblock %}

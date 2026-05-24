@@ -1,0 +1,385 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="mb-5">
+        <h3 class="fw-bold"><i class="fa-solid fa-user-shield text-success me-2"></i>AgriConnect Administrative Control Panel</h3>
+        <p class="text-muted small">Verify agricultural listings, moderate user access, and log platform bulk escrow transactions.</p>
+    </div>
+
+    <!-- Administrative Statistics -->
+    <div class="row g-4 mb-5">
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card">
+                <div>
+                    <small class="text-muted d-block font-semibold">Total Platform Users</small>
+                    <h3 class="fw-bold text-success mb-0 mt-1">{{ total_users }}</h3>
+                </div>
+                <i class="fa-solid fa-users stat-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card sales">
+                <div>
+                    <small class="text-muted d-block font-semibold">Registered Crop Inventory</small>
+                    <h3 class="fw-bold text-success mb-0 mt-1">{{ total_crops }}</h3>
+                </div>
+                <i class="fa-solid fa-wheat-awn stat-icon"></i>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card orders">
+                <div>
+                    <small class="text-muted d-block font-semibold">Processed Orders</small>
+                    <h3 class="fw-bold text-warning mb-0 mt-1">{{ total_orders }}</h3>
+                </div>
+                <i class="fa-solid fa-receipt stat-icon text-warning"></i>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="stat-card earnings">
+                <div>
+                    <small class="text-muted d-block font-semibold">Escrow Volume Logs</small>
+                    <h3 class="fw-bold text-success mb-0 mt-1">₹ {{ total_sales }}</h3>
+                </div>
+                <i class="fa-solid fa-money-bill-trend-up stat-icon text-success"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Operations Tabs -->
+    <div class="card-agri p-4 bg-white border-0 shadow-sm mb-5">
+        <ul class="nav nav-pills ai-nav-pills mb-4" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="users-tab" data-bs-toggle="pill" data-bs-target="#users-panel" type="button" role="tab" aria-controls="users-panel" aria-selected="true">
+                    <i class="fa-solid fa-users me-2"></i>Manage Platform Users
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="crops-tab" data-bs-toggle="pill" data-bs-target="#crops-panel" type="button" role="tab" aria-controls="crops-panel" aria-selected="false">
+                    <i class="fa-solid fa-wheat-awn me-2"></i>Verify Crop Listings
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="orders-tab" data-bs-toggle="pill" data-bs-target="#orders-panel" type="button" role="tab" aria-controls="orders-panel" aria-selected="false">
+                    <i class="fa-solid fa-list-check me-2"></i>System Transaction Logs
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="adminTabsContent">
+            <!-- Panel Users -->
+            <div class="tab-pane fade show active" id="users-panel" role="tabpanel" aria-labelledby="users-tab">
+                <div class="row g-4 mb-3">
+                    <div class="col-12 col-lg-8">
+                        <h5 class="fw-bold mb-3 small text-muted">Active Platform Farmers, Buyers, & Administrators</h5>
+                    </div>
+                    <div class="col-12 col-lg-4">
+                        <div class="card border-0 bg-light p-3 shadow-sm rounded-4">
+                            <h6 class="fw-bold mb-3">Add New User</h6>
+                            <form action="{{ url_for('admin_add_user') }}" method="POST" class="row g-2">
+                                <div class="col-6">
+                                    <input name="username" type="text" class="form-control form-control-sm" placeholder="Username" required>
+                                </div>
+                                <div class="col-6">
+                                    <input name="email" type="email" class="form-control form-control-sm" placeholder="Email" required>
+                                </div>
+                                <div class="col-6">
+                                    <input name="password" type="password" class="form-control form-control-sm" placeholder="Password" required>
+                                </div>
+                                <div class="col-6">
+                                    <select name="role" class="form-select form-select-sm" required>
+                                        <option value="">Select Role</option>
+                                        <option value="farmer">Farmer</option>
+                                        <option value="buyer">Buyer</option>
+                                        <option value="admin">Admin</option>
+                                    </select>
+                                </div>
+                                <div class="col-6">
+                                    <input name="phone" type="tel" class="form-control form-control-sm" placeholder="Phone">
+                                </div>
+                                <div class="col-6">
+                                    <input name="city" type="text" class="form-control form-control-sm" placeholder="City">
+                                </div>
+                                <div class="col-12">
+                                    <input name="state" type="text" class="form-control form-control-sm" placeholder="State">
+                                </div>
+                                <div class="col-12 text-end">
+                                    <button type="submit" class="btn btn-success btn-sm">Create User</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle small">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th>User ID</th>
+                                <th>Username</th>
+                                <th>Email Address</th>
+                                <th>Profile Role</th>
+                                <th>Contact Number</th>
+                                <th>Location Context</th>
+                                <th>Created Date</th>
+                                <th>Account Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in users %}
+                            <tr>
+                                <td class="fw-bold">#{{ user.id }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="bg-success-subtle p-2 rounded-circle text-success small" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa-solid fa-user"></i>
+                                        </div>
+                                        <span class="fw-semibold text-dark">{{ user.username }}</span>
+                                    </div>
+                                </td>
+                                <td>{{ user.email }}</td>
+                                <td>
+                                    {% if user.role == 'farmer' %}
+                                        <span class="badge bg-success-subtle text-success badge-agri text-capitalize">Farmer</span>
+                                    {% elif user.role == 'buyer' %}
+                                        <span class="badge bg-primary-subtle text-primary badge-agri text-capitalize">Buyer</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger badge-agri text-capitalize">Admin</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ user.phone if user.phone else 'N/A' }}</td>
+                                <td>{{ user.city if user.city else 'N/A' }}, {{ user.state if user.state else 'N/A' }}</td>
+                                <td class="text-muted">{{ user.created_at.strftime('%d %b %Y') }}</td>
+                                <td>
+                                    {% if user.id == session.get('user_id') %}
+                                        <span class="badge bg-success small"><i class="fa-solid fa-circle-check me-1"></i>Active Self</span>
+                                    {% elif user.crops or user.buyer_orders or user.farmer_orders %}
+                                        <span class="badge bg-secondary">In Use</span>
+                                    {% else %}
+                                        <form action="{{ url_for('toggle_user', user_id=user.id) }}" method="POST" onsubmit="return confirm('Are you absolutely sure you want to delete this user?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger d-flex align-items-center gap-1">
+                                                <i class="fa-solid fa-user-xmark"></i> Remove User
+                                            </button>
+                                        </form>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel Crops Verification -->
+            <div class="tab-pane fade" id="crops-panel" role="tabpanel" aria-labelledby="crops-tab">
+                <h5 class="fw-bold mb-3 small text-muted">Crop Listings Verification & Moderation Desk</h5>
+                <div class="card border-0 bg-light p-4 rounded-4 mb-4">
+                    <h6 class="fw-bold mb-3">Add Crop to Platform</h6>
+                    <form action="{{ url_for('admin_add_crop') }}" method="POST" enctype="multipart/form-data" class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Farmer Owner</label>
+                            <select name="farmer_id" class="form-select form-select-sm">
+                                <option value="">Admin as Owner</option>
+                                {% for farmer in farmers %}
+                                    <option value="{{ farmer.id }}">{{ farmer.username }} ({{ farmer.city or 'Unknown' }}, {{ farmer.state or 'Unknown' }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Crop Name</label>
+                            <input name="name" type="text" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Category</label>
+                            <select name="category" class="form-select form-select-sm" required>
+                                <option value="Grains">Grains</option>
+                                <option value="Vegetables">Vegetables</option>
+                                <option value="Fruits">Fruits</option>
+                                <option value="Pulses">Pulses</option>
+                                <option value="Spices">Spices</option>
+                                <option value="Others">Others</option>
+                            </select>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Price (₹/kg)</label>
+                            <input name="price" type="number" step="0.01" min="0" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Available Qty (kg)</label>
+                            <input name="quantity" type="number" step="0.01" min="0" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Min Order Qty</label>
+                            <input name="min_order_qty" type="number" step="0.01" min="1" class="form-control form-control-sm" value="1" required>
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label small fw-semibold">Upload Image</label>
+                            <input name="image" type="file" class="form-control form-control-sm" accept="image/*">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">Location</label>
+                            <input name="location" type="text" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label small fw-semibold">State</label>
+                            <input name="state" type="text" class="form-control form-control-sm" required>
+                        </div>
+                        <div class="col-md-12">
+                            <label class="form-label small fw-semibold">Description</label>
+                            <textarea name="description" rows="2" class="form-control form-control-sm"></textarea>
+                        </div>
+                        <div class="col-12 text-end">
+                            <button type="submit" class="btn btn-success btn-sm">Add Crop</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle small">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th>Crop ID</th>
+                                <th>Crop Info</th>
+                                <th>Category</th>
+                                <th>Listed By Farmer</th>
+                                <th>Wholesale Price</th>
+                                <th>Inventory</th>
+                                <th>Farmer Location</th>
+                                <th>Moderation Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if crops %}
+                                {% for crop in crops %}
+                                <tr>
+                                    <td class="fw-bold">#{{ crop.id }}</td>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if crop.image_url.startswith('http://') or crop.image_url.startswith('https://') %}
+                                            <img src="{{ crop.image_url }}" style="width: 40px; height: 40px; object-fit: cover;" class="rounded-2" alt="">
+                                            {% elif crop.image_url.startswith('uploads/') %}
+                                            <img src="{{ url_for('static', filename=crop.image_url) }}" style="width: 40px; height: 40px; object-fit: cover;" class="rounded-2" alt="">
+                                            {% else %}
+                                                {% if crop.category == 'Grains' %}
+                                                <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?q=80&w=600" style="width: 40px; height: 40px; object-fit: cover;" class="rounded-2" alt="">
+                                                {% elif crop.category == 'Vegetables' %}
+                                                <img src="https://images.unsplash.com/photo-1597362925123-77861d3fbac7?q=80&w=600" style="width: 40px; height: 40px; object-fit: cover;" class="rounded-2" alt="">
+                                                {% elif crop.category == 'Fruits' %}
+                                                <img src="https://images.unsplash.com/photo-1619546813926-a78fa6372ca2?q=80&w=600" style="width: 40px; height: 40px; object-fit: cover;" class="rounded-2" alt="">
+                                                {% elif crop.category == 'Pulses' %}
+                                                <img src="https://images.unsplash.com/photo-1586201375761-83865001e31c?q=80&w=600" style="width: 40px; height: 40px; object-fit: cover;" class="rounded-2" alt="">
+                                                {% else %}
+                                                <img src="https://images.unsplash.com/photo-1592982537447-7440770cbfc9?q=80&w=600" style="width: 40px; height: 40px; object-fit: cover;" class="rounded-2" alt="">
+                                                {% endif %}
+                                            {% endif %}
+                                            <span class="fw-semibold text-dark">{{ crop.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-capitalize">{{ crop.category }}</td>
+                                    <td class="fw-semibold">{{ crop.farmer.username if crop.farmer else 'Deleted User' }}</td>
+                                    <td class="fw-bold text-success">₹ {{ crop.price }} / kg</td>
+                                    <td>{{ crop.quantity }} kg</td>
+                                    <td>{{ crop.location }}, {{ crop.state }}</td>
+                                    <td>
+                                        <div class="d-flex flex-column gap-2">
+                                            <form action="{{ url_for('toggle_crop', crop_id=crop.id) }}" method="POST">
+                                                {% if crop.is_approved %}
+                                                    <button type="submit" class="btn btn-sm btn-outline-warning d-flex align-items-center gap-1">
+                                                        <i class="fa-solid fa-ban"></i> Disapprove Crop
+                                                    </button>
+                                                {% else %}
+                                                    <button type="submit" class="btn btn-sm btn-success text-white d-flex align-items-center gap-1 px-3">
+                                                        <i class="fa-solid fa-circle-check"></i> Approve Listing
+                                                    </button>
+                                                {% endif %}
+                                            </form>
+                                            {% if crop.orders|length == 0 %}
+                                                <form action="{{ url_for('admin_delete_crop', crop_id=crop.id) }}" method="POST" onsubmit="return confirm('Delete this crop from the platform?');">
+                                                    <button type="submit" class="btn btn-sm btn-danger d-flex align-items-center gap-1">
+                                                        <i class="fa-solid fa-trash"></i> Remove Crop
+                                                    </button>
+                                                </form>
+                                            {% else %}
+                                                <span class="badge bg-secondary">In Use</span>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-wheat-awn-slash fs-3 mb-2 d-block text-muted"></i>
+                                        No platform crops found to verify.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Panel Orders Log -->
+            <div class="tab-pane fade" id="orders-panel" role="tabpanel" aria-labelledby="orders-tab">
+                <h5 class="fw-bold mb-3 small text-muted">Real-time Bulk Crop Escrow Ledger</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle small">
+                        <thead class="table-light text-muted">
+                            <tr>
+                                <th>Order ID</th>
+                                <th>Crop item</th>
+                                <th>Retail Buyer</th>
+                                <th>Producer Farmer</th>
+                                <th>Qty Placed</th>
+                                <th>Gross Escrow Value</th>
+                                <th>Shipment Tracker</th>
+                                <th>Escrow State</th>
+                                <th>Transaction Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if orders %}
+                                {% for order in orders %}
+                                <tr>
+                                    <td class="fw-bold">#{{ order.id }}</td>
+                                    <td>{{ order.crop.name if order.crop else 'Deleted Crop' }}</td>
+                                    <td class="fw-semibold">{{ order.buyer.username if order.buyer else 'Deleted User' }}</td>
+                                    <td class="fw-semibold">{{ order.farmer.username if order.farmer else 'Deleted User' }}</td>
+                                    <td>{{ order.quantity }} kg</td>
+                                    <td class="fw-bold text-success">₹ {{ order.total_price }}</td>
+                                    <td>
+                                        {% if order.status == 'Pending' %}
+                                            <span class="badge bg-warning-subtle text-warning">Pending</span>
+                                        {% elif order.status == 'Shipped' %}
+                                            <span class="badge bg-primary-subtle text-primary">Shipped</span>
+                                        {% elif order.status == 'Delivered' %}
+                                            <span class="badge bg-success-subtle text-success">Delivered</span>
+                                        {% else %}
+                                            <span class="badge bg-danger-subtle text-danger">Cancelled</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if order.payment_status == 'Paid' %}
+                                            <span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i>Funds Held (Paid)</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Awaiting Payment</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-muted">{{ order.created_at.strftime('%d %b %Y %H:%M') }}</td>
+                                </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="9" class="text-center py-5 text-muted">
+                                        <i class="fa-solid fa-file-invoice-dollar fs-3 mb-2 d-block text-muted"></i>
+                                        No escrow orders transaction records mapped yet on the network ledger.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
